@@ -63,7 +63,7 @@ function handle(q) {
         const j = find(r => String(r[C.dev]).trim() === dev);
         if (j >= 0) return { ok: false, err: 'Bu kompüter artıq ' + pretty(digits(rows[j][C.phone])) + ' nömrəsi ilə qeydiyyatdadır. Həmin nömrə ilə daxil ol və ya əlaqə saxla: ' + contact };
         const days = Number(setting('Sınaq günləri', 7)) || 7, until = new Date(now.getTime() + days * 864e5);
-        const row = [pretty(ph), String(q.name || '').trim().slice(0, 80), 'Sınaq', until, 'aktiv', newCode(rows), dev, now, ver, now, ''];
+        const row = ["'" + pretty(ph), String(q.name || '').trim().slice(0, 80), 'Sınaq', until, 'aktiv', newCode(rows), dev, now, ver, now, ''];
         s.appendRow(row); const R = s.getLastRow();
         s.getRange(R, C.until + 1).setNumberFormat('dd.MM.yyyy'); s.getRange(R, C.seen + 1).setNumberFormat('dd.MM.yyyy HH:mm'); s.getRange(R, C.reg + 1).setNumberFormat('dd.MM.yyyy');
         rows.push(row); i = rows.length - 1;
