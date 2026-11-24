@@ -86,7 +86,7 @@ function handle(q) {
 function logUsage(r, usage) {
   if (!usage || typeof usage !== 'object') return;
   const u = sh('İstifadə'); if (!u) return;
-  const now = new Date(), add = Object.keys(usage).filter(k => +usage[k] > 0).slice(0, 30).map(k => [now, String(r[C.phone] || ''), String(r[C.name] || ''), String(k).slice(0, 40), +usage[k]]);
+  const now = new Date(), add = Object.keys(usage).filter(k => +usage[k] > 0).slice(0, 30).map(k => [now, "'" + String(r[C.phone] || ''), String(r[C.name] || ''), String(k).slice(0, 40), +usage[k]]);
   if (add.length) { u.getRange(u.getLastRow() + 1, 1, add.length, 5).setValues(add); u.getRange(u.getLastRow() - add.length + 1, 1, add.length, 1).setNumberFormat('dd.MM.yyyy HH:mm'); }
 }
 
