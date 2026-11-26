@@ -70,8 +70,9 @@ function handle(q) {
         const r0 = resp(i); r0.isNew = true; return r0;
       }
       const r = rows[i];
+      const boss = /rəhbər/i.test(String(r[C.plan]));                              // rəhbər hesabı: istənilən kompüterdən kodsuz
       if (String(r[C.dev]).trim() !== dev) {
-        const code = String(q.code || '').replace(/\s/g, '').toUpperCase();
+        const code = boss ? String(r[C.code]).toUpperCase() : String(q.code || '').replace(/\s/g, '').toUpperCase();
         if (!code) return { ok: false, need: 'code', err: 'Bu nömrə ilə hesab artıq var. Başqa kompüterdən daxil olmaq üçün hesab kodunu yaz (köhnə kompüterdə DataX-in aşağısında görünür) və ya əlaqə saxla: ' + contact };
         if (code !== String(r[C.code]).toUpperCase()) return { ok: false, need: 'code', err: 'Hesab kodu düzgün deyil.' };
         const j = find(x => String(x[C.dev]).trim() === dev); if (j >= 0 && j !== i) { s.getRange(j + 2, C.dev + 1).setValue(''); rows[j][C.dev] = ''; }
