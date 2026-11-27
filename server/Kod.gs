@@ -49,7 +49,7 @@ function handle(q) {
       return { ok: true, status: stop ? 'dayandirilib' : 'aktiv', until, plan: String(r[C.plan] || ''), name: String(r[C.name] || ''), phone: pretty(digits(r[C.phone])), code: String(r[C.code] || ''), contact,
         key: !stop && until ? sign(dev, String(r[C.name] || ''), until) : '' };
     };
-    const touch = i => s.getRange(i + 2, C.seen + 1, 1, 2).setValues([[now, ver]]);
+    const touch = i => { s.getRange(i + 2, C.seen + 1, 1, 2).setValues([[now, ver]]); if (q.upd != null) s.getRange(i + 2, NC + 1).setValue(String(q.upd).slice(0, 120)); };   // L sütunu: yeniləyicinin son işləməsi
     if (q.a === 'sync') {
       const i = find(r => String(r[C.dev]).trim() === dev);
       if (i < 0) return { ok: false, reason: 'yoxdur', contact };
