@@ -106,3 +106,38 @@ function qurasdir() {
   let u = sh('İstifadə') || b.insertSheet('İstifadə');
   u.getRange(1, 1, 1, 5).setValues([['Tarix', 'Telefon', 'Ad / şirkət', 'Funksiya', 'Neçə dəfə']]).setFontWeight('bold'); u.setFrozenRows(1);
 }
+
+// ---- Müddəti cədvəldən uzatmaq ----
+// 1) "Plan" xanasında "Aylıq" və ya "İllik" seçəndə bitmə tarixi özü 1 ay / 1 il uzanır (müddət hələ bitməyibsə — köhnə tarixdən, bitibsə — bu gündən)
+// 2) Menyu: DataX → Seçilmiş müştərini 1 ay / 1 il uzat (eyni plan təkrar ödəniləndə)
+function uzat(s, row, months) {
+  const cell = s.getRange(row, C.until + 1), old = cell.getValue(), today = new Date(); today.setHours(0, 0, 0, 0);
+  const base = old instanceof Date && old > today ? new Date(old.getTime()) : today;
+  base.setMonth(base.getMonth() + months);
+  cell.setValue(base).setNumberFormat('dd.MM.yyyy');
+  if (String(s.getRange(row, C.status + 1).getValue()).trim() !== 'aktiv') s.getRange(row, C.status + 1).setValue('aktiv');
+  return Utilities.formatDate(base, TZ(), 'dd.MM.yyyy');
+}
+function onEdit(e) {
+  try {
+    const r = e.range, s = r.getSheet();
+    if (s.getName() !== 'Müştərilər' || r.getRow() < 2 || r.getNumRows() !== 1 || r.getColumn() !== C.plan + 1) return;
+    const p = String(e.value || '').toLowerCase(), mo = /ayl/.test(p) ? 1 : /ill/.test(p) ? 12 : 0;
+    if (!mo) return;
+    const d = uzat(s, r.getRow(), mo);
+    e.source.toast(String(s.getRange(r.getRow(), C.name + 1).getValue()) + ': bitmə tarixi ' + d, 'DataX — uzadıldı', 6);
+  } catch (x) {}
+}
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('DataX').addItem('Seçilmiş müştərini 1 ay uzat', 'uzat1Ay').addItem('Seçilmiş müştərini 1 il uzat', 'uzat1Il').addToUi();
+}
+function uzatSecilen(mo) {
+  const s = SpreadsheetApp.getActiveSheet(), ui = SpreadsheetApp.getUi();
+  if (s.getName() !== 'Müştərilər') { ui.alert('Əvvəl "Müştərilər" vərəqində müştərinin sətrinə klik et.'); return; }
+  const row = s.getActiveRange().getRow(); if (row < 2) { ui.alert('Müştərinin sətrinə klik et.'); return; }
+  const name = s.getRange(row, C.name + 1).getValue() || s.getRange(row, C.phone + 1).getDisplayValue();
+  if (ui.alert(name + ' — müddət ' + (mo === 12 ? '1 il' : '1 ay') + ' uzadılsın?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+  ui.alert(name + ': yeni bitmə tarixi ' + uzat(s, row, mo));
+}
+function uzat1Ay() { uzatSecilen(1); }
+function uzat1Il() { uzatSecilen(12); }
